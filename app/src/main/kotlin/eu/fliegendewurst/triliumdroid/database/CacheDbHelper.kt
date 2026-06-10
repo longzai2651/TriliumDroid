@@ -458,6 +458,37 @@ class CacheDbHelper(context: Context, private val sql: String) :
 					execSQL("UPDATE notes SET type='code', mime='application/json' WHERE type='aiChat'")
 					Log.i(TAG, "migration to version 234 done")
 				}
+				if (oldVersion < 235 && newVersion >= 235) {
+					Log.i(TAG, "creating indices for performance")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_entity_changes_isSynced_id\n" +
+							"                ON entity_changes (isSynced, id)")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_entity_changes_isErased_entityName\n" +
+							"                ON entity_changes (isErased, entityName)")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_notes_isDeleted_utcDateModified\n" +
+							"                ON notes (isDeleted, utcDateModified)")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_branches_isDeleted_utcDateModified\n" +
+							"                ON branches (isDeleted, utcDateModified)")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_attributes_isDeleted_utcDateModified\n" +
+							"                ON attributes (isDeleted, utcDateModified)")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_attachments_isDeleted_utcDateModified\n" +
+							"                ON attachments (isDeleted, utcDateModified)")
+					execSQL("DROP INDEX IF EXISTS IDX_branches_parentNoteId")
+					execSQL("CREATE INDEX IF NOT EXISTS IDX_branches_parentNoteId_isDeleted_notePosition\n" +
+							"                ON branches (parentNoteId, isDeleted, notePosition)")
+				}
+				if (oldVersion < 236 && newVersion >= 236) {
+					execSQL("ALTER TABLE blobs ADD COLUMN textRepresentation TEXT DEFAULT NULL")
+				}
+				if (oldVersion < 237 && newVersion >= 237) {
+					execSQL("DELETE FROM options WHERE name = 'keyboardShortcutsShowNoteRevisions'")
+					execSQL("DELETE FROM entity_changes WHERE entityName = 'options' AND entityId = 'keyboardShortcutsShowNoteRevisions'")
+					execSQL("DELETE FROM options WHERE name = 'keyboardShortcutsForceSaveNoteRevision'")
+					execSQL("DELETE FROM entity_changes WHERE entityName = 'options' AND entityId = 'keyboardShortcutsForceSaveNoteRevision'")
+				}
+				if (oldVersion < 238 && newVersion >= 238) {
+					execSQL("ALTER TABLE revisions ADD COLUMN description TEXT DEFAULT '' NOT NULL")
+					execSQL("ALTER TABLE revisions ADD COLUMN source TEXT DEFAULT 'auto' NOT NULL")
+				}
 				// always update to latest version
 				execSQL(
 					"UPDATE options SET value = ? WHERE name = 'dbVersion'",

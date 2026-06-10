@@ -1,7 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.dokka' version '2.0.0'
 }
 
@@ -11,8 +11,8 @@ android {
         minSdkVersion 24
         compileSdk 36
         targetSdkVersion 36
-        versionCode 21
-        versionName "0.102.1-alpha16"
+        versionCode 22
+        versionName "0.103.0-alpha17"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments useTestStorageService: "true"
@@ -23,8 +23,8 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            // TODO: check if proguard-android-optimize.txt still causes trouble
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // TODO: if problematic, temporarily use `-dontoptimize` in custom rules file
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
             applicationIdSuffix ".debug"
@@ -53,9 +53,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
     packaging {
         resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
     }
@@ -72,6 +69,12 @@ android {
         }
     }
     namespace 'eu.fliegendewurst.triliumdroid'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_1_8
+    }
 }
 
 dependencies {

@@ -428,9 +428,9 @@ class InitialSyncTest {
 		Thread.sleep(2000) // wait until ready
 		onView(withId(R.id.drawer_layout))
 			.perform(DrawerActions.open(Gravity.START))
-		onView(withText("Books"))
-			.perform(longClick())
 		onView(withText("Formatting examples"))
+			.perform(longClick())
+		onView(withText("Books"))
 			.perform(longClick())
 		Thread.sleep(500)
 		saveScreenshot()
